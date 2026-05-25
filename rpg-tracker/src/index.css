@@ -1,0 +1,359 @@
+body { 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+  background-color: #1e1e2f; 
+  color: #fff; 
+  margin: 0; 
+  padding: 0; 
+  display: flex; 
+  height: 100vh; 
+  overflow: hidden; 
+}
+
+#root {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+}
+
+h1, h2, h3 { 
+  text-align: center; 
+  color: #ffcc00; 
+  margin-top: 0;
+}
+
+/* =========================================
+   LAYOUT PRINCIPAL E BARRA LATERAL (RECOLHÍVEL)
+========================================= */
+.app-sidebar { 
+  width: 220px; 
+  background: #151521; 
+  box-shadow: 2px 0 15px rgba(0,0,0,0.8); 
+  z-index: 10; 
+  display: flex; 
+  flex-direction: column; 
+  padding: 20px 10px; 
+  flex-shrink: 0; 
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Animação suave de encolhimento */
+  overflow: hidden; 
+}
+
+/* Quando o estado do React adicionar essa classe, a barra diminui */
+.app-sidebar.collapsed { width: 65px; }
+
+.sidebar-header { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  border-bottom: 2px solid #3f3f5a; 
+  padding-bottom: 10px; 
+  margin-bottom: 40px; 
+}
+
+.brand-title { color: #ffcc00; font-size: 20px; margin: 0; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+
+.toggle-btn { background: transparent; border: none; color: #ffcc00; font-size: 22px; cursor: pointer; padding: 5px; border-radius: 5px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0; }
+.toggle-btn:hover { background: #2a2a40; }
+
+.nav-item { background: #2a2a40; padding: 15px 12px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; border-left: 5px solid transparent; color: #fff; display: flex; align-items: center; gap: 15px; transition: 0.2s; white-space: nowrap; }
+.nav-item:hover { background: #3f3f5a; }
+/* NOVO: A classe 'active' acende a aba atual */
+.nav-item.active { border-left: 5px solid #ffcc00; background: #3f3f5a; }
+
+/* A mágica para o texto sumir em fade-out quando a barra encolhe */
+.nav-text { transition: opacity 0.2s ease, width 0.2s ease; opacity: 1; }
+.app-sidebar.collapsed .nav-text { opacity: 0; width: 0; pointer-events: none; }
+
+.app-main { flex: 1; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; align-items: center; }
+
+/* Painel de Dados e Botão d20 */
+.dice-panel { background: #2a2a40; padding: 15px 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; flex-shrink: 0; width: 100%; max-width: 900px; }
+.dice-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.dice-btn { 
+  position: relative; 
+  width: 60px; 
+  height: 60px; 
+  border: none; 
+  background: transparent; 
+  cursor: pointer; 
+  transition: transform 0.1s; 
+  /* NOVO: Faz o dado projetar uma sombra no fundo do app para não sumir */
+  filter: drop-shadow(0px 5px 8px rgba(0, 0, 0, 0.8)); 
+}
+
+ /*  dados e textura deles */
+.dice-btn:hover { transform: translateY(-3px); }
+.dice-btn:active { transform: translateY(4px); }
+.dice-type-text { position: absolute; top: -10px; left: 0; right: 0; text-align: center; font-size: 10px; font-weight: bold; color: rgba(255, 255, 255, 0.7); z-index: 2; pointer-events: none; }
+.dice-texture { 
+  position: absolute; 
+  inset: 0; 
+  border-radius: 4px; 
+  /* NOVO: Azul mais claro e vibrante (0, 191, 255) com modo de mesclagem mais limpo */
+  background: linear-gradient(135deg, rgba(139, 69, 19, 0.95) 0%, rgba(0, 191, 255, 0.95) 40%, rgba(139, 69, 19, 0.95) 100%), 
+              linear-gradient(-45deg, rgba(61, 104, 248, 0.95) 0%, rgba(139, 69, 19, 0.95) 60%); 
+  background-blend-mode: overlay, normal; 
+  /* NOVO: Sombra interna bem forte para simular a borda escura dentro do dado */
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.95); 
+  transition: box-shadow 0.2s; 
+}
+
+/* Formas dos dados */
+.dice-shape.d20 { clip-path: polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%); }
+.dice-btn span.dice-number-static { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 16px; font-weight: bold; color: rgba(255, 255, 255, 0.6); pointer-events: none;}
+.dice-texture.circle { border-radius: 50%; }
+.dice-shape.d12 { clip-path: polygon(50% 0%, 100% 36%, 100% 64%, 81% 100%, 19% 100%, 0% 64%, 0% 36%); }
+.dice-shape.d10 { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+.dice-shape.d8  { clip-path: polygon(50% 0%, 100% 36%, 100% 64%, 50% 100%, 0% 64%, 0% 36%); }
+.dice-shape.d6  { border-radius: 4px; }
+.dice-shape.d4  { clip-path: polygon(50% 0%, 100% 100%, 0% 100%); }
+
+/* Área de Resultado */
+.dice-result-area { display: flex; align-items: center; gap: 15px; background: #1e1e2f; padding: 10px 20px; border-radius: 8px; }
+.dice-result-area input { font-size: 20px; font-weight: bold; text-align: center; width: 80px; color: #ffcc00; background: #3f3f5a; margin: 0; border: none; border-radius: 5px; padding: 5px; }
+.btn-clear-dice { background: #ff4d4d; color: white; padding: 10px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; border: none; }
+
+/* =========================================
+   OVERLAY E CAIXA DE DADOS (DICE TRAY)
+========================================= */
+.dice-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+
+.dice-tray { width: 320px; height: 320px; background: #4e342e; border: 20px solid #3e2723; border-radius: 15px; box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 10px 30px rgba(0,0,0,0.8); position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; animation: trayAppear 0.3s ease; }
+@keyframes trayAppear { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* O Dado dentro da Caixa */
+.dice-visual { position: absolute; width: 140px; height: 140px; animation: throwInBox 1.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+
+.dice-visual-texture { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(139, 69, 19, 0.95) 0%, rgba(0, 191, 255, 0.95) 40%, rgba(139, 69, 19, 0.95) 100%), linear-gradient(-45deg, rgba(0, 191, 255, 0.95) 0%, rgba(139, 69, 19, 0.95) 60%); background-blend-mode: overlay, normal; box-shadow: inset 0 0 15px rgba(0,0,0,0.95); border-radius: 4px; }
+.dice-visual-texture.circle { border-radius: 50%; }
+
+/* Números Gigantes do Dado Animado */
+.dice-number { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 55px; font-weight: bold; color: rgba(255, 255, 255, 0.9); text-shadow: 2px 2px 0 rgba(139,69,19,0.9); }
+.shape-d4-num { top: 62% !important; }
+.shape-d12-num { top: 48% !important; }
+
+/* Física do Arremesso (Bate-bate) */
+@keyframes throwInBox {
+    0%   { transform: translate(250px, -250px) scale(1.5) rotate(1080deg); opacity: 0; } /* Surge de fora da tela */
+    15%  { opacity: 1; }
+    30%  { transform: translate(-70px, 70px) scale(1) rotate(720deg); }   /* Bate Canto Inferior Esquerdo */
+    50%  { transform: translate(60px, -50px) scale(1) rotate(450deg); }   /* Bate Canto Superior Direito */
+    70%  { transform: translate(-30px, 30px) scale(1) rotate(200deg); }   /* Quique Meio Esquerdo */
+    85%  { transform: translate(15px, -15px) scale(1) rotate(90deg); }    /* Quique curto Direita */
+    100% { transform: translate(0, 0) scale(1) rotate(0deg); }            /* Para no centro */
+}
+
+/* =========================================
+   CADASTRO E BANCO DE PERSONAGENS (ROSTER)
+========================================= */
+.main-layout { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; width: 100%; max-width: 1200px; margin-top: 10px; }
+.roster-panel { flex: 1; min-width: 320px; background: #2a2a40; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+
+/* Upload de Token (Avatar) */
+.avatar-picker { position: relative; width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 15px auto; background: #3f3f5a; border: 2px dashed #888; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; }
+.avatar-picker img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-placeholder { font-size: 30px; }
+.avatar-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; opacity: 0; transition: opacity 0.2s; text-align: center; padding: 10px; }
+.avatar-picker:hover .avatar-overlay { opacity: 1; }
+
+/* Inputs e Seleções do Cadastro */
+.roster-panel input, .roster-panel select { background: #3f3f5a; color: white; width: 100%; box-sizing: border-box; padding: 8px; border-radius: 5px; border: none; font-size: 14px; margin-bottom: 8px; }
+.inline-inputs { display: flex; gap: 10px; margin-bottom: 5px; }
+.inline-inputs input { flex: 1; } 
+
+/* Cards dos Personagens Salvos */
+.list-container { list-style: none; padding: 0; margin-top: 20px; }
+.card { background: #3f3f5a; margin-bottom: 15px; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+.roster-card { flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+
+.card-header { display: flex; gap: 15px; align-items: center; width: 100%; margin-bottom: 10px; }
+.token-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #ffcc00; background: #1e1e2f; flex-shrink: 0; }
+.token-placeholder { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #ffcc00; background: #1e1e2f; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+
+.info-text { font-size: 13px; color: #b3b3cc; display: block; margin-top: 2px; text-align: left; }
+.card-stats-preview { color: #ffcc00; font-weight: bold; font-size: 13px; display: block; margin-top: 4px; text-align: left; }
+
+/* Botões específicos do Roster */
+.btn-save { background: #4CAF50; color: white; width: 100%; margin-top: 10px; cursor: pointer; font-weight: bold; padding: 10px; border-radius: 5px; border: none; }
+.btn-save:hover { background: #45a049; }
+.btn-cancel { background: #888; color: white; width: 100%; margin-top: 5px; cursor: pointer; font-weight: bold; padding: 8px; border-radius: 5px; border: none; }
+.btn-import { background: #2196F3; color: white; cursor: pointer; font-weight: bold; padding: 6px 10px; border-radius: 5px; border: none; }
+.btn-import:hover { background: #1976D2; }
+.btn-standard { background: #ffcc00; color: #1e1e2f; cursor: pointer; font-weight: bold; padding: 6px 10px; border-radius: 5px; border: none; }
+.btn-standard:hover { background: #e6b800; }
+.btn-danger { background: #ff4d4d; color: white; cursor: pointer; font-weight: bold; padding: 6px 10px; border-radius: 5px; border: none; }
+.btn-danger:hover { background: #cc0000; }
+
+/* Combate */
+.combat-area { flex: 2; min-width: 500px; background: #2a2a40; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+
+/* =========================================
+   ESTILIZAÇÃO DO PAINEL DE COMBATE E INICIATIVA
+========================================= */
+
+/* Caixas de texto dentro da área de Combate (PV, PE, Efeitos) */
+.combat-area input {
+  background: #3f3f5a;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 5px;
+  font-size: 14px;
+  outline: none;
+}
+.combat-area input::placeholder { color: #888; }
+
+/* Botões de Efeito Positivo e Negativo */
+.btn-pos { background: #4CAF50; color: white; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+.btn-pos:hover { background: #45a049; }
+
+.btn-neg { background: #7b00b4; color: white; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+.btn-neg:hover { background: #7b00b4; }
+
+/* Organização visual das linhas de PV/PE e Efeitos */
+.action-group { 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  background: #1e1e2f; 
+  padding: 8px; 
+  border-radius: 8px; 
+  margin-bottom: 5px; 
+}
+.stat-display { font-weight: bold; min-width: 50px; }
+.pv-color { color: #ff4d4d; }
+.pe-color { color: #3399ff; }
+
+/* Caixa de texto da Iniciativa (No Roster) */
+.init-input {
+  background: #1e1e2f !important;
+  color: #ffcc00 !important;
+  border: 1px solid #555 !important;
+  border-radius: 5px;
+  width: 60px !important;
+  padding: 8px !important;
+  text-align: center;
+  font-weight: bold;
+  outline: none;
+}
+.init-input::placeholder { color: #666; font-weight: normal; }
+
+/* =========================================
+   TAGS DE EFEITOS (BADGES)
+========================================= */
+
+/* O contêiner que guarda todos os efeitos lado a lado */
+.effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* O visual base da etiqueta */
+.effect-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 20px; /* Deixa bem arredondado como uma pílula */
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Cor do Efeito Positivo */
+.effect-badge.positive {
+  background: #4CAF50; /* Verde */
+  border: 1px solid #388E3C;
+}
+
+/* Cor do Efeito Negativo */
+.effect-badge.negative {
+  background: #9c27b0; /* Roxo (para combinar com seu botão) */
+  border: 1px solid #7b1fa2;
+}
+
+/* O "X" de fechar/remover o efeito */
+.effect-badge span {
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.7;
+  transition: 0.2s;
+  padding: 0 4px;
+}
+
+/* Quando passa o mouse no "X" */
+.effect-badge span:hover {
+  opacity: 1;
+  color: #ffcc00; /* Fica amarelo para dar destaque na hora de clicar */
+  transform: scale(1.2);
+}
+
+/* =========================================
+   DESTAQUE DO TURNO ATIVO NO COMBATE
+========================================= */
+.active-turn {
+  border-left: 6px solid #ffcc00 !important;
+  background-color: #35354d !important; 
+  box-shadow: 0 4px 20px rgba(255, 204, 0, 0.15) !important; 
+  transform: translateX(10px) !important; 
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+
+/* Botões de Ação do Combate */
+.btn-turn { background: #ffcc00; color: #111; font-weight: bold; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+.btn-turn:hover { background: #e6b800; transform: scale(1.02); }
+
+.btn-ok { background: #ffcc00; color: #111; font-weight: bold; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+.btn-ok:hover { background: #e6b800; transform: scale(1.05); }
+
+/* ==========================================================================
+   SISTEMA DE GAVETAS (FIXO E SEM PULAR)
+   ========================================================================== */
+
+/* O container precisa ser relativo para servir de base para a orelha absoluta */
+.import-drawer-container, .dice-drawer-container {
+  display: flex;
+  position: relative; 
+  flex-shrink: 0;
+  height: fit-content;
+}
+
+/* O conteúdo recolhe, mas não empurra a orelha */
+.import-content, .dice-content {
+  transition: width 0.35s ease, opacity 0.35s ease;
+  width: 320px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.import-content.closed, .dice-content.closed {
+  width: 0px !important;
+  opacity: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+/* A orelha é absoluta: ela fica sempre na mesma coordenada X/Y */
+.tab-handle-left {
+  position: absolute;
+  right: -30px; /* Ajuste este valor se a orelha não encostar na borda */
+  top: 0;
+  background: #2a2a40;
+  color: #ffcc00;
+  border: 1px solid #3f3f5a;
+  border-left: none;
+  padding: 18px 8px;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 11px;
+  writing-mode: vertical-lr;
+  text-transform: uppercase;
+  height: fit-content;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+  z-index: 10; /* Garante que fique por cima de tudo */
+}
