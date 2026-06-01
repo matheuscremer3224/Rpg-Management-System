@@ -145,7 +145,15 @@ h1, h2, h3 {
 /* =========================================
    CADASTRO E BANCO DE PERSONAGENS (ROSTER)
 ========================================= */
-.main-layout { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; width: 100%; max-width: 1200px; margin-top: 10px; }
+.main-layout { 
+  display: flex; 
+  width: 100%;
+  justify-content: space-between;
+  align-items: flex-start; 
+  gap: 20px;
+  margin-top: 10px; 
+}
+
 .roster-panel { flex: 1; min-width: 320px; background: #2a2a40; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
 
 /* Upload de Token (Avatar) */
@@ -184,7 +192,15 @@ h1, h2, h3 {
 .btn-danger:hover { background: #cc0000; }
 
 /* Combate */
-.combat-area { flex: 2; min-width: 500px; background: #2a2a40; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+.combat-area { 
+  width: 450px; /* Define um tamanho fixo para parar de cortar */
+  flex-shrink: 0; /* Impede que a gaveta esprema o combate */
+  background: #2a2a40; 
+  padding: 20px; 
+  border-radius: 10px; 
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5); 
+  margin-left: auto; /* Joga pro canto direito */
+}
 
 /* =========================================
    ESTILIZAÇÃO DO PAINEL DE COMBATE E INICIATIVA
@@ -291,7 +307,7 @@ h1, h2, h3 {
 }
 
 /* =========================================
-   DESTAQUE DO TURNO ATIVO NO COMBATE
+   PAINEL DE COMBATE: EFEITO DE TURNO ATIVO E BOTÕES DE AÇÃO
 ========================================= */
 .active-turn {
   border-left: 6px solid #ffcc00 !important;
@@ -301,47 +317,69 @@ h1, h2, h3 {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-
-/* Botões de Ação do Combate */
 .btn-turn { background: #ffcc00; color: #111; font-weight: bold; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; transition: 0.2s; }
 .btn-turn:hover { background: #e6b800; transform: scale(1.02); }
 
 .btn-ok { background: #ffcc00; color: #111; font-weight: bold; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; transition: 0.2s; }
 .btn-ok:hover { background: #e6b800; transform: scale(1.05); }
 
-/* ==========================================================================
-   SISTEMA DE GAVETAS (FIXO E SEM PULAR)
-   ========================================================================== */
 
-/* O container precisa ser relativo para servir de base para a orelha absoluta */
+/* Combate */
+.active-turn {
+  border-left: 6px solid #ffcc00 !important;
+  background-color: #35354d !important; 
+  box-shadow: 0 4px 20px rgba(255, 204, 0, 0.15) !important; 
+  transform: translateX(10px) !important; 
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.btn-turn { background: #ffcc00; color: #111; font-weight: bold; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+.btn-turn:hover { background: #e6b800; transform: scale(1.02); }
+
+.btn-ok { background: #ffcc00; color: #111; font-weight: bold; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+.btn-ok:hover { background: #e6b800; transform: scale(1.05); }
+
+/* Gavetas laterais */
 .import-drawer-container, .dice-drawer-container {
   display: flex;
   position: relative; 
   flex-shrink: 0;
-  height: fit-content;
+  width: fit-content;
 }
 
-/* O conteúdo recolhe, mas não empurra a orelha */
 .import-content, .dice-content {
   transition: width 0.35s ease, opacity 0.35s ease;
-  width: 320px;
+  width: 360px; /* Largura aumentada para os dados caberem */
   opacity: 1;
   overflow: hidden;
+  white-space: nowrap; 
 }
 
 .import-content.closed, .dice-content.closed {
   width: 0px !important;
+  min-width: 0px !important;
   opacity: 0 !important;
   padding: 0 !important;
   margin: 0 !important;
   border: none !important;
 }
 
-/* A orelha é absoluta: ela fica sempre na mesma coordenada X/Y */
+/* Painéis internos das gavetas */
+.dice-panel, .roster-panel {
+  width: 360px !important; 
+  max-width: 360px !important;
+  box-sizing: border-box;
+  margin: 0 !important;
+}
+
+.closed .roster-panel, .closed .dice-panel {
+  min-width: 0px !important;
+}
+
 .tab-handle-left {
   position: absolute;
-  right: -30px; /* Ajuste este valor se a orelha não encostar na borda */
   top: 0;
+  left: 100%; 
   background: #2a2a40;
   color: #ffcc00;
   border: 1px solid #3f3f5a;
@@ -355,5 +393,17 @@ h1, h2, h3 {
   text-transform: uppercase;
   height: fit-content;
   box-shadow: 2px 0 5px rgba(0,0,0,0.3);
-  z-index: 10; /* Garante que fique por cima de tudo */
+  z-index: 10;
+}
+
+.tab-handle-left:hover {
+  background: #3f3f5a;
+  color: #fff;
+}
+
+.gavetas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex-shrink: 0;
 }
